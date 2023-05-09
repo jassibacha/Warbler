@@ -104,8 +104,7 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        user = User.authenticate(form.username.data,
-                                 form.password.data)
+        user = User.authenticate(form.username.data,form.password.data)
 
         if user:
             do_login(user)
@@ -120,8 +119,9 @@ def login():
 @app.route('/logout')
 def logout():
     """Handle logout of user."""
-
-    # IMPLEMENT THIS
+    do_logout()
+    flash(f"Successfully logged out.", "danger")
+    return redirect("/")
 
 
 ##############################################################################
