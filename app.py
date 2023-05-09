@@ -325,8 +325,12 @@ def homepage():
     """
 
     if g.user:
+        # Iterates over g.user.following (list of users that the current user is following) and create a new list with the id attribute of each user. 
+        following_filter = [f.id for f in g.user.following] + [g.user.id] # add own id at the end!
+
         messages = (Message
                     .query
+                    .filter(Message.user_id.in_(following_filter)) # filter by our list!
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())
