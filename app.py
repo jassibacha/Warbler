@@ -342,6 +342,12 @@ def messages_destroy(message_id):
         return redirect("/")
 
     msg = Message.query.get(message_id)
+
+    if g.user.id != msg.user_id:
+        #can only delete your own message
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+        
     db.session.delete(msg)
     db.session.commit()
 
