@@ -124,5 +124,6 @@ class UserModelTestCase(TestCase):
             password="HASHED_PASSWORD4",
             image_url="/static/images/default-pic.png"
         )
+        db.session.commit()
         self.assertIsNone(new_user)
-        db.session.rollback()
+        #db.session.rollback()
