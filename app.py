@@ -347,7 +347,7 @@ def messages_destroy(message_id):
         #can only delete your own message
         flash("Access unauthorized.", "danger")
         return redirect("/")
-        
+
     db.session.delete(msg)
     db.session.commit()
 
@@ -369,18 +369,20 @@ def homepage():
     if g.user:
         # Iterates over g.user.following (list of users that the current user is following) and create a new list with the id attribute of each user. 
         following_filter = [follower.id for follower in g.user.following]
-        # Add users id to this list so their tweets appear also, derp!
+        # Add global users id to this list so their tweets appear also, derp!
         following_filter.append(g.user.id)
 
         user_id = g.user.id # Using this for conditional logic in the template, not sure if I even need to assign it or I can just call g.user in the template.
 
+        # Need to filter out list that we make
         messages = (Message
-                    .query
-                    .filter(Message.user_id.in_(following_filter)) # filter by our list!
+                    .query # filter by our list!
+                    .filter(Message.user_id.in_(following_filter))
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())
 
+        # Get all of the msg id's that the user has liked
         liked_msgs = [msg.id for msg in g.user.likes]
 
         return render_template('home.html', messages=messages, likes=liked_msgs, user_id=user_id)
