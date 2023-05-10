@@ -216,6 +216,7 @@ def stop_following(follow_id):
 
 @app.route('/users/<int:user_id>/likes', methods=["GET"])
 def show_likes(user_id):
+    """Show the users liked messages!"""
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
@@ -306,7 +307,7 @@ def messages_show(message_id):
 
 @app.route('/messages/<int:message_id>/like', methods=["POST"])
 def messages_like(message_id):
-    """Like a message."""
+    """Like a message based on id."""
 
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -361,7 +362,11 @@ def homepage():
 
     if g.user:
         # Iterates over g.user.following (list of users that the current user is following) and create a new list with the id attribute of each user. 
-        following_filter = [f.id for f in g.user.following] + [g.user.id] # add own id at the end!
+        following_filter = [follower.id for follower in g.user.following]
+        # Add users id to this list so their tweets appear also, derp!
+        following_filter.append(g.user.id)
+
+        user_id = g.user.id # Using this for conditional logic in the template, not sure if I even need to assign it or I can just call g.user in the template.
 
         messages = (Message
                     .query
@@ -372,7 +377,7 @@ def homepage():
 
         liked_msgs = [msg.id for msg in g.user.likes]
 
-        return render_template('home.html', messages=messages, likes=liked_msgs)
+        return render_template('home.html', messages=messages, likes=liked_msgs, user_id=user_id)
 
     else:
         return render_template('home-anon.html')

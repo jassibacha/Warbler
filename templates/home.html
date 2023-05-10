@@ -69,6 +69,9 @@
                     >
                     <p>{{ msg.text }}</p>
                 </div>
+
+                {# Only show like button on stuff we CAN like! #} {% if user_id
+                != msg.user_id: %}
                 <form
                     method="POST"
                     action="/messages/{{ msg.id }}/like"
@@ -76,13 +79,14 @@
                 >
                     <button
                         class="
-                btn 
-                btn-sm 
-                {{'btn-primary' if msg.id in likes else 'btn-secondary'}}"
+                  btn 
+                  btn-sm 
+                  {{'btn-primary' if msg.id in likes else 'btn-secondary'}}"
                     >
                         <i class="fa fa-thumbs-up"></i>
                     </button>
                 </form>
+                {% endif %}
             </li>
             {% endfor %}
         </ul>
