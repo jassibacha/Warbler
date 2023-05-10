@@ -7,6 +7,7 @@
 
 import os
 from unittest import TestCase
+from sqlalchemy import exc
 
 from models import db, User, Message, Follows
 
@@ -42,9 +43,9 @@ class UserModelTestCase(TestCase):
         self.client = app.test_client()
 
         # Create some users to use in the tests
-        self.u = User(email="test@test.com",username="testuser",password="HASHED_PASSWORD")
-        self.u1 = User(email="test1@test.com",username="testuser1",password="HASHED_PASSWORD1")
-        self.u2 = User(email="test2@test.com",username="testuser2",password="HASHED_PASSWORD2")
+        self.u = User.signup(email="test@test.com",username="testuser",password="HASHED_PASSWORD",image_url=None)
+        self.u1 = User.signup(email="test1@test.com",username="testuser1",password="HASHED_PASSWORD1",image_url=None)
+        self.u2 = User.signup(email="test2@test.com",username="testuser2",password="HASHED_PASSWORD2",image_url=None)
 
         db.session.add_all([self.u, self.u1, self.u2])
         db.session.commit()
@@ -124,6 +125,33 @@ class UserModelTestCase(TestCase):
             password="HASHED_PASSWORD4",
             image_url="/static/images/default-pic.png"
         )
-        db.session.commit()
-        self.assertIsNone(new_user)
+        with self.assertRaises(exc.IntegrityError) as context:
+            db.session.commit()
+            self.assertIsNone(new_user)
         #db.session.rollback()
+
+    def test_invalid_username_signup(self):
+        invalid = User.signup(None, "pizza@gmail.com", "password", None)
+        with self.assertRaises(exc.IntegrityError) as context:
+            db.session.commit()
+            self.assertIsNone(invalid)
+
+    def test_invalid_email_signup(self):
+        invalid = User.signup("testtest", None, "password", None)
+        with self.assertRaises(exc.IntegrityError) as context:
+            db.session.commit()
+            self.assertIsNone(invalid)
+
+    def test_valid_authentication(self):
+        """Does User.authenticate successfully return a user when given a valid username and password?"""
+
+        ut = User.authenticate(self.u.username, "HASHED_PASSWORD")
+        self.assertIsNotNone(ut)
+        self.assertEqual(ut.id, self.u.id)
+
+    
+    def test_invalid_username(self):
+        self.assertFalse(User.authenticate("badusername", "password"))
+
+    def test_wrong_password(self):
+        self.assertFalse(User.authenticate(self.u.username, "badpassword"))
