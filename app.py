@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, request, flash, redirect, session, g, abort
+from flask import Flask, render_template, request, flash, redirect, session, g, abort, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
@@ -315,15 +315,19 @@ def messages_like(message_id):
 
     message = Message.query.get_or_404(message_id)
     # Make sure htye aren't liking their own post!
-    if liked_msg.user_id == g.user.id:
+    if message.user_id == g.user.id:
         return abort(403)
 
     if g.user.has_liked_message(message):
+        print(f'*************************************')
         print(f'{g.user} has like message {message.id} already, time to unlike')
-        g.user,unlike_message(message)
+        print(f'*************************************')
+        g.user.unlike_message(message)
         liked = False
     else:
+        print(f'*************************************')
         print(f'{g.user} has not like message {message.id} , time to like')
+        print(f'*************************************')
         g.user.like_message(message)
         liked = True
 
