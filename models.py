@@ -169,6 +169,25 @@ class User(db.Model):
 
         return False
 
+    def has_liked_message(self, message):
+        """Return True if this user has liked the given message."""
+
+        return message in self.likes
+
+    def like_message(self, message):
+        """Add a like for this user to the given message."""
+
+        like = Likes(user_id=self.id, message_id=message.id)
+        db.session.add(like)
+        message.likes.append(like)
+
+    def unlike_message(self, message):
+        """Remove a like for this user from the given message."""
+
+        like = Likes.query.filter_by(user_id=self.id, message_id=message.id).first()
+        db.session.delete(like)
+        message.likes.remove(like)
+
 
 class Message(db.Model):
     """An individual message ("warble")."""

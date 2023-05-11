@@ -309,28 +309,42 @@ def messages_show(message_id):
 def messages_like(message_id):
     """Like a message based on id."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    # if not g.user:
+    #     flash("Access unauthorized.", "danger")
+    #     return redirect("/")
 
-    liked_msg = Message.query.get_or_404(message_id)
+    message = Message.query.get_or_404(message_id)
     # Make sure htye aren't liking their own post!
     if liked_msg.user_id == g.user.id:
         return abort(403)
 
-    # Get current users likes
-    user_likes = g.user.likes
-    
-    if liked_msg in user_likes:
-        # User had liked it already, we need to remove it from user_likes
-        g.user.likes = [like for like in user_likes if like != liked_msg] 
-        # rebuild g.user.likes without this like in it!
-    else: 
-        g.user.likes.append(liked_msg)
+    if g.user.has_liked_message(message):
+        print(f'{g.user} has like message {message.id} already, time to unlike')
+        g.user,unlike_message(message)
+        liked = False
+    else:
+        print(f'{g.user} has not like message {message.id} , time to like')
+        g.user.like_message(message)
+        liked = True
 
     db.session.commit()
 
-    return redirect('/')
+    return jsonify({'liked': liked}) # Return true or false
+
+
+    # # Get current users likes
+    # user_likes = g.user.likes
+    
+    # if liked_msg in user_likes:
+    #     # User had liked it already, we need to remove it from user_likes
+    #     g.user.likes = [like for like in user_likes if like != liked_msg] 
+    #     # rebuild g.user.likes without this like in it!
+    # else: 
+    #     g.user.likes.append(liked_msg)
+
+    # db.session.commit()
+
+    # return redirect('/')
 
 
 @app.route('/messages/<int:message_id>/delete', methods=["POST"])

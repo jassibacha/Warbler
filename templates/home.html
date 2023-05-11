@@ -52,7 +52,7 @@
         <ul class="list-group" id="messages">
             {% for msg in messages %}
             <li class="list-group-item">
-                <a href="/messages/{{ msg.id  }}" class="message-link" />
+                {# <a href="/messages/{{ msg.id  }}" class="message-link" /> #}
                 <a href="/users/{{ msg.user.id }}">
                     <img
                         src="{{ msg.user.image_url }}"
@@ -72,20 +72,15 @@
 
                 {# Only show like button on stuff we CAN like! #} {% if user_id
                 != msg.user_id: %}
-                <form
-                    method="POST"
-                    action="/messages/{{ msg.id }}/like"
-                    id="messages-form"
-                >
-                    <button
-                        class="
+
+                <button
+                    class="
                   btn 
-                  btn-sm 
-                  {{'btn-primary' if msg.id in likes else 'btn-secondary'}}"
-                    >
-                        <i class="fa fa-thumbs-up"></i>
-                    </button>
-                </form>
+                  btn-sm like-button 
+                  {{'btn-primary' if msg.id in likes else 'btn-secondary'}}" data-message-id="{{msg.id}}""
+                >
+                    <i class="fa fa-thumbs-up"></i>
+                </button>
                 {% endif %}
             </li>
             {% endfor %}
