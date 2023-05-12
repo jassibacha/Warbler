@@ -319,15 +319,15 @@ def messages_like(message_id):
         return abort(403)
 
     if g.user.has_liked_message(message):
-        print(f'*************************************')
-        print(f'{g.user} has like message {message.id} already, time to unlike')
-        print(f'*************************************')
+        # print(f'*************************************')
+        # print(f'{g.user} has like message {message.id} already, time to unlike')
+        # print(f'*************************************')
         g.user.unlike_message(message)
         liked = False
     else:
-        print(f'*************************************')
-        print(f'{g.user} has not like message {message.id} , time to like')
-        print(f'*************************************')
+        # print(f'*************************************')
+        # print(f'{g.user} has not like message {message.id} , time to like')
+        # print(f'*************************************')
         g.user.like_message(message)
         liked = True
 
